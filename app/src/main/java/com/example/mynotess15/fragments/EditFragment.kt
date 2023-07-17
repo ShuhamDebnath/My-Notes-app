@@ -42,7 +42,7 @@ class EditFragment : Fragment() {
             val tempNote = viewModel.getTempNote()
             binding.editTextTitle.setText(tempNote.title)
             binding.editTextDescription.setText(tempNote.description)
-
+            color = tempNote.color
             val startColor = ContextCompat.getColor(requireContext(), stringToColor(tempNote.color))
             val endColor = ContextCompat.getColor(requireContext(), R.color.white)
             setBackgroundGradient(binding.root,startColor,endColor)
@@ -71,6 +71,7 @@ class EditFragment : Fragment() {
         }
 
         binding.imageBack.setOnClickListener {
+            saveNote()
             toHomeFragment()
         }
         binding.imageGallery.setOnClickListener() {
@@ -85,39 +86,43 @@ class EditFragment : Fragment() {
 
 
 
+
         binding.imageSave.setOnClickListener {
-
-            val title = binding.editTextTitle.text.toString()
-            val description = binding.editTextDescription.text.toString()
-            val date = SimpleDateFormat("dd-MMM-yy").format(Date())
-            val color = color
-
-            if (title.isNotEmpty() || description.isNotEmpty()) {
-
-
-                if (viewModel.getIsUpdate()) {
-                    //update
-                    val id = viewModel.getTempNote().id
-                    val note = Note(id, title, description, date, "null", color)
-                    viewModel.update(note)
-                    Toast.makeText(requireActivity(), "Note updated", Toast.LENGTH_SHORT).show()
-                    viewModel.setIsUpdate(false)
-                    Log.d("TAG", "onViewCreated: note updated : $note")
-                } else {
-                    //create
-                    val note = Note(0, title, description, date, "null", color)
-                    viewModel.insert(note)
-                    Toast.makeText(requireActivity(), "Note inserted", Toast.LENGTH_SHORT).show()
-                    Log.d("TAG", "onViewCreated: note created : $note")
-                }
-
-            } else {
-                Toast.makeText(requireActivity(), "Invalid Input", Toast.LENGTH_SHORT).show()
-            }
+            saveNote()
             toHomeFragment()
         }
 
 
+    }
+
+    private fun saveNote(){
+        val title = binding.editTextTitle.text.toString()
+        val description = binding.editTextDescription.text.toString()
+        val date = SimpleDateFormat("dd-MMM-yy").format(Date())
+        val color = color
+
+        if (title.isNotEmpty() || description.isNotEmpty()) {
+
+
+            if (viewModel.getIsUpdate()) {
+                //update
+                val id = viewModel.getTempNote().id
+                val note = Note(id, title, description, date, "null", color)
+                viewModel.update(note)
+                Toast.makeText(requireActivity(), "Note updated", Toast.LENGTH_SHORT).show()
+                viewModel.setIsUpdate(false)
+                Log.d("TAG", "onViewCreated: note updated : $note")
+            } else {
+                //create
+                val note = Note(0, title, description, date, "null", color)
+                viewModel.insert(note)
+                Toast.makeText(requireActivity(), "Note inserted", Toast.LENGTH_SHORT).show()
+                Log.d("TAG", "onViewCreated: note created : $note")
+            }
+
+        } else {
+            Toast.makeText(requireActivity(), "Invalid Input", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun toHomeFragment() {
@@ -185,23 +190,6 @@ class EditFragment : Fragment() {
         }
     }
 
-//    private fun setBackgroundColor(color: String) {
-//        return when (color) {
-//            "red" -> binding.root.setBackgroundResource(R.color.red)
-//            "green" -> binding.root.setBackgroundResource(R.color.green)
-//            "grey" -> binding.root.setBackgroundResource(R.color.grey)
-//            "orange" -> binding.root.setBackgroundResource(R.color.orange)
-//            "pink" -> binding.root.setBackgroundResource(R.color.pink)
-//            "sky" -> binding.root.setBackgroundResource(R.color.sky)
-//            "yellow" -> binding.root.setBackgroundResource(R.color.yellow)
-//            else -> {
-//                binding.root.setBackgroundResource(R.color.greyLight)
-//            }
-//        }
-//    }
-
-
-
     override fun onPause() {
         super.onPause()
         viewModel.setIsUpdate(false)
@@ -232,6 +220,7 @@ class EditFragment : Fragment() {
             }
         }
     }
+
 
 
 }
